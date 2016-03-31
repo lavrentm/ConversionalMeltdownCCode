@@ -102,7 +102,6 @@ int main(int argc, char *argv[])
 
 	ostringstream tempstring;	
 
-// cout << "I am here, process " << rank << endl;
 
 if (rank == 0) {
 
@@ -189,42 +188,28 @@ MPI::COMM_WORLD.Barrier();
     vector< double > sdencount;
     vector< double > scolorprobperc;
     vector< double > scolorprobperctemp(numcolors);
-    vector< double > ssectorcount;
-    vector< double > ssectorwidths;
 
     vector< double > dencount;
     vector< double > colorprobperc;
     vector< double > colorprobperctemp(numcolors);
-    vector< double > sectorcount;
-    vector< double > sectorwidths;
 
 
     
 
             scolorprobperc.clear();
             sdencount.clear();
-if (startseed>0){ 
-            ssectorcount.clear();
-            ssectorwidths.clear(); }
 
             colorprobperc.clear();
             dencount.clear();
-if (startseed>0){ 
-            sectorcount.clear();
-            sectorwidths.clear(); }
 
 
            for (int j=0; j<numcolors; j++) {
                scolorprobperc.push_back(0);
-            if (startseed>0) {   ssectorwidths.push_back(0);
-               			ssectorcount.push_back(0);   }
                sdencount.push_back(0);
                 }    
                            
            for (int j=0; j<numcolors; j++) {
                colorprobperc.push_back(0);
-            if (startseed>0) {   sectorwidths.push_back(0);
-               			sectorcount.push_back(0);   }
                dencount.push_back(0);
                 }    
      
@@ -237,15 +222,11 @@ for (int t2=0; t2<nslices; t2++) {
       
            for (int j=0; j<numcolors; j++) {
                scolorprobperc[j]=0;
-            if (startseed>0) {   ssectorwidths[j]=0;
-               			ssectorcount[j]=0;   }
                sdencount[j]=0;
                 }    
                            
            for (int j=0; j<numcolors; j++) {
                colorprobperc[j]=0;
-            if (startseed>0) {   sectorwidths[j]=0;
-               			sectorcount[j]=0;   }
                dencount[j]=0;
                 }    
  
@@ -253,7 +234,6 @@ for (int t2=0; t2<nslices; t2++) {
 for (int run=1; run<=numruns; run++) {
     
   
-//  for (int i=0; i < latticesizex; i++) {latteven[i]=-1; lattodd[i]=-1;}
   
   if(startseed>0) {
           leftedge=rownd(latticesizex/2)-rownd(startseed/2);
@@ -267,14 +247,12 @@ for (int run=1; run<=numruns; run++) {
  else { for (int i=0; i <latticesizex; i++) latteven[i]=rg.IRandom(1,2); }
        }
        
-  //     cout << "begin simulation run." << endl;
    for (int t=1; t<=latticesizet; t++) {        
        
        // Odd steps:
               rannum1=rg.Random();
               rannum2=rg.Random();
        if (latteven[0]!=latteven[latticesizex-1]) {
-          //       if(rannum1 < (basegrowth-double(latteven[0]-1)*selection)/(2*basegrowth-double(latteven[0]+latteven[latticesizex-1]-2)*selection))
 	if (rannum1 < prob1(latteven[0],latteven[latticesizex-1],selection))
                  {
                       lattodd[0]=latteven[0];      
@@ -333,34 +311,14 @@ for (int run=1; run<=numruns; run++) {
                    for(int i=0; i < latticesizex; i++) {            
                          dencount[lattodd[(i+it)%latticesizex]-1]+=1/latticesizexd/numrunsd; 
                         colorprobperctemp[lattodd[(i+it)%latticesizex]-1]=1;  
-                         /*
-                         if (startseed>0) {
-                         if (latteven[(i+it)%latticesizex]!=latteven[(i+it+1)%latticesizex])
-                         {
-                                sectorwidths[ncounter][latteven[(i+it)%latticesizex]-1]+=sectorwidth/numrunsd;
-                                sectorcount[ncounter][latteven[(i+it)%latticesizex]-1]+=1/numrunsd;
-                                sectorwidth=0;                                                            
-                                                        } else { sectorwidth=sectorwidth+1; }
-                                         }               
-                           */                      
                                }  
                    for(int j=0; j < numcolors; j++) colorprobperc[j]+=colorprobperctemp[j]/numrunsd;            
-                   /*
-                   if (sectorwidth==latticesizex && startseed>0) {
-                           sectorcount[ncounter][latteven[0]-1]+=1/numrunsd; 
-                           sectorwidths[ncounter][latteven[0]-1]+=sectorwidth/numrunsd; 
-                                                  }           
-                       */
                                                    }
 
 
 		for (int j=0; j < numcolors; j++) {
 			dencount[j] = dencount[j]/double(size);
 		        colorprobperc[j] = colorprobperc[j]/double(size);
-		if (startseed>0) {
-		//	 sectorcount[i][j] = sectorcount[i][j]/double(size);			
-		//	 sectorwidths[i][j] = sectorwidths[i][j]/double(size);
-			}
 		}
 
 
@@ -369,10 +327,6 @@ MPI::COMM_WORLD.Barrier();
 
 	MPI::COMM_WORLD.Reduce(&dencount.front(),&sdencount.front() , numcolors , MPI::DOUBLE, MPI::SUM, root);
 	MPI::COMM_WORLD.Reduce(&colorprobperc.front(),&scolorprobperc.front() , numcolors , MPI::DOUBLE, MPI::SUM, root);
-	if (startseed>0) {
-	MPI::COMM_WORLD.Reduce(&sectorcount.front(),&ssectorcount.front() ,sectorcount.size(), MPI::DOUBLE, MPI::SUM, root);
-	MPI::COMM_WORLD.Reduce(&sectorwidths.front(),&ssectorwidths.front() ,sectorwidths.size(), MPI::DOUBLE, MPI::SUM, root);
-                         }
 
 MPI::COMM_WORLD.Barrier();
 
