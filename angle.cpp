@@ -187,14 +187,12 @@ MPI::COMM_WORLD.Barrier();
     vector< vector< double > > scolorprobperc(nslices+5);
     vector< double > scolorprobperctemp(numcolors);
     vector< vector< double > > ssectorcount(nslices+5);
-    vector< vector< double > > ssectorwidths(nslices+5);
 
 	
     vector< vector< double > > dencount(nslices+5);
     vector< vector< double > > colorprobperc(nslices+5);
     vector< double > colorprobperctemp(numcolors);
     vector< vector< double > > sectorcount(nslices+5);
-    vector< vector< double > > sectorwidths(nslices+5);
     vector< double > probperc(nslices+5);
     vector< double > sprobperc(nslices+5);
 
@@ -213,14 +211,12 @@ MPI::COMM_WORLD.Barrier();
             scolorprobperc[i].clear();
             sdencount[i].clear();
 if (startseed>0){ 
-            ssectorcount[i].clear();
-            ssectorwidths[i].clear(); }
+            ssectorcount[i].clear(); }
 
             colorprobperc[i].clear();
             dencount[i].clear();
 if (startseed>0){ 
-            sectorcount[i].clear();
-            sectorwidths[i].clear(); }
+            sectorcount[i].clear(); }
 
             } 
 
@@ -230,7 +226,7 @@ if (startseed>0){
 
            for (int j=0; j<numcolors; j++) {
                scolorprobperc[i].push_back(0);
-            if (startseed>0) {   ssectorwidths[i].push_back(0);
+            if (startseed>0) {   
                			ssectorcount[i].push_back(0);   }
                sdencount[i].push_back(0);
                 }    
@@ -238,7 +234,7 @@ if (startseed>0){
 
            for (int j=0; j<numcolors; j++) {
                colorprobperc[i].push_back(0);
-            if (startseed>0) {   sectorwidths[i].push_back(0);
+            if (startseed>0) {   
                			sectorcount[i].push_back(0);   }
                dencount[i].push_back(0);
                 }    
@@ -290,7 +286,6 @@ for (int run=1; run<=numruns; run++) {
                          if (startseed>0) {
                          if (latteven[(i+it)%latticesizex]!=latteven[(i+it+1)%latticesizex])
                          {
-                                sectorwidths[ncounter][latteven[(i+it)%latticesizex]-1]+=sectorwidth/numrunsd;
                                 sectorcount[ncounter][latteven[(i+it)%latticesizex]-1]+=1/numrunsd;
                                 sectorwidth=0;                                                            
                                                         } else { sectorwidth=sectorwidth+1; } }
@@ -311,7 +306,6 @@ for (int run=1; run<=numruns; run++) {
                    
                    if (sectorwidth==latticesizex && startseed>0) {
                            sectorcount[ncounter][latteven[0]-1]+=1/numrunsd; 
-                           sectorwidths[ncounter][latteven[0]-1]+=sectorwidth/numrunsd; 
                                                   }            
                                                          
        ncounter++;
@@ -414,7 +408,7 @@ for (int run=1; run<=numruns; run++) {
                          if (startseed>0) {
                          if (latteven[(i+it)%latticesizex]!=latteven[(i+it+1)%latticesizex])
                          {
-                                sectorwidths[ncounter][latteven[(i+it)%latticesizex]-1]+=sectorwidth/numrunsd;
+
                                 sectorcount[ncounter][latteven[(i+it)%latticesizex]-1]+=1/numrunsd;
                                 sectorwidth=0;                                                            
                                                         } else { sectorwidth=sectorwidth+1; }
@@ -434,7 +428,6 @@ for (int run=1; run<=numruns; run++) {
                    for(int j=0; j < numcolors; j++) colorprobperc[ncounter][j]+=colorprobperctemp[j]/numrunsd;            
                    if (sectorwidth==latticesizex && startseed>0) {
                            sectorcount[ncounter][latteven[0]-1]+=1/numrunsd; 
-                           sectorwidths[ncounter][latteven[0]-1]+=sectorwidth/numrunsd; 
                                                   }           
               ncounter++;   
                        } 
@@ -445,8 +438,7 @@ for (int run=1; run<=numruns; run++) {
 			dencount[i][j] = dencount[i][j]/double(size);
 		        colorprobperc[i][j]=colorprobperc[i][j]/double(size);
 		if (startseed>0) {
-			 sectorcount[i][j] = sectorcount[i][j]/double(size);			
-			 sectorwidths[i][j] = sectorwidths[i][j]/double(size);
+			 sectorcount[i][j] = sectorcount[i][j]/double(size);	
 			}
 		}
 		if (probperc[i]>EPSILON) {
@@ -471,7 +463,6 @@ MPI::COMM_WORLD.Barrier();
 	MPI::COMM_WORLD.Reduce(&colorprobperc[i].front(),&scolorprobperc[i].front() , numcolors , MPI::DOUBLE, MPI::SUM, root);
 	if (startseed>0) {
 	MPI::COMM_WORLD.Reduce(&sectorcount[i].front(),&ssectorcount[i].front() ,sectorcount[i].size(), MPI::DOUBLE, MPI::SUM, root);
-	MPI::COMM_WORLD.Reduce(&sectorwidths[i].front(),&ssectorwidths[i].front() ,sectorwidths[i].size(), MPI::DOUBLE, MPI::SUM, root);
                          }
 }
 
@@ -488,7 +479,7 @@ if (rank==0) {
 				outstats << " " <<  sdencount[i][j]; 
 					   }
                           if (startseed>0) {
-  outstats << " " << scolorprobperc[i][j]  << " " << ssectorcount[i][j] << " " << ssectorwidths[i][j];
+  outstats << " " << scolorprobperc[i][j]  << " " << ssectorcount[i][j];
 						 }
                      }
                    outstats << endl;   
