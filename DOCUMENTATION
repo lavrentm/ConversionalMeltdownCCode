@@ -1,0 +1,29 @@
+Documentation for phase diagram code (phase.cpp) and sector angle calculation (angle.cpp) for two-dimensional range expansions.  The range expansions have a one-dimensional frontier (i.e., a single line of cells).  There are two types of cells: unconverted and converted.  The unconverted cells have a selective advantage "s" and mutate to the converted type with a mutational rate "mu", called "selection" and "mutf" in the code.  See http://biorxiv.org/content/early/2016/01/25/027292 and M. O. Lavrentovich, K. S. Korolev, and D. R. Nelson, Phys. Rev. E 87, 012103 (2013) for more details and motivation for the model.
+
+All input to the programs comes from standard input.  The list of input values, in order in which they are inputted are given below with their descriptions:
+phase.cpp inputs (all integers):
+1) latticesizex  -  Size of range expansion frontier, measured in number of cells
+2) latticesizet  -  Number of generations to evolve the range expansion.  During each generation, each cell on the frontier divides. Statistics for the range expansion are computed only after all latticesizet steps have been performed.
+3) nslices  -  When forming the phase diagram, a square grid of nslices by nsclices values of the mutation parameter "mu" and selection coefficient "s" are used.  To set the range of the values, the phase.cpp code has to be modified in the place indicated in the code comments
+4) numruns  -  Number of range expansion runs to perform. Each statistical quantitiy is averaged over these runs.
+5) startseed  -  If startseed=0, start population with all unconverted cells.  If startseed>0, start population with all converted cells, but with a small initial patch of converted cells that is startseed cells wide
+6) numcolors  -  Should always be set equal to 2, the number of cell types.  This is to allow for extensions to multiple cell types in the future.
+angle.cpp inputs (all integers, except selection and mutf are doubles):
+1) latticesizex  -  see above
+2) latticesizet  -  Number of generations to evolve the range expansion.  During each generation, each cell on the frontier divides.
+3) selection  -  This is the selection parameter between 0 and 1 that describes the selective advantage of the unconverted strain
+4) mutf  -  This is the mutation or conversion rate (between 0 and 1). A newly born unconverted cell converts with this probability.
+5) nslices  -    Calculate various statistical quantities (such as the cell type densities) every latticesizet/nslices timesteps
+6) numruns  -  see above
+7) startseed  -  see above, except the startseed=0 case is not well defined since the we then do not have an initial sector and the angle cannot be measured. so, startseed should be greater than 0 for this implementation
+8) numcolors  -  see above
+
+The codes run on MPI and each process runs a separate instance of the range expansion.  The head node then compiles all the range expansion results at the end of the runs and writes to an output file.  The output file has a few header lines marked with "#" that show the parameter values used.  After that, there are output lines of the following form:
+phase.cpp outputs:
+if startseed=0: selection mutf sdencount
+where sdencount is the density of unconverted cells
+if startseed>0: selection mutf scolorprobperc
+where scolorprobperc is the probability that the intial cluster of unconverted cells has survived after latticesizet generations
+angle.cpp outputs:
+timestep average_cluster_spread number_of_runs_with_surviving_cluster cluster_survival_probability average_number_of_compact_unconverted_cell_sectors
+The relevant output is the average cluster spread.  This can be used to calculate the sector openning angle by plotting it versus the timestep and measuring the slope of the resulting line.
