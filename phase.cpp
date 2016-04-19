@@ -213,11 +213,16 @@ MPI::COMM_WORLD.Barrier();
                dencount.push_back(0);
                 }    
      
+     // initialize the lowest value of the conversion rate mutf used in the phase diagram:
 mutf=0;
+
 ncounter=0;
 for (int t1=0; t1<nslices; t1++) {
 
+// Initialize the lowest value of the selection parameter used in the phase diagram:
 selection=0;
+
+
 for (int t2=0; t2<nslices; t2++) {
       
            for (int j=0; j<numcolors; j++) {
@@ -345,8 +350,10 @@ MPI::COMM_WORLD.Barrier();
 
 
         ncounter++;
+        // Set the range of the selection parameter "s" used in the phase diagram. The range is added on to the previous selection parameter value as selection=selection+range/double(nslices-1);
 	selection=selection+1/double(nslices-1);
 	}
+	// Set the range of the conversion rate "mu" used in the phase diagram. The range is specified as mutf=mutf+range/double(nslices-1);
 	mutf=mutf+0.5/double(nslices-1);
 	}
 
