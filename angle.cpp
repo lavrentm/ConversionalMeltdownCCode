@@ -76,7 +76,6 @@ int main(int argc, char *argv[])
     int latticesizex;
     double latticesizexd;
     int startseed;
-    int heteroyes;
     int numcolors;
     double basegrowth = -1;
     
@@ -90,7 +89,7 @@ int main(int argc, char *argv[])
 if (rank == 0) {
 
 
-    cin >> latticesizex >> latticesizet >> selection >> mutf >> nslices >> numruns >> startseed >> heteroyes >> numcolors;
+    cin >> latticesizex >> latticesizet >> selection >> mutf >> nslices >> numruns >> startseed >> numcolors;
 
     statsfilename = "s";
     tempstring << selection;	
@@ -113,9 +112,7 @@ if (rank == 0) {
     statsfilename += "ss";
     statsfilename += tempstring.str();
 
-	if (heteroyes==1) {
-		statsfilename += "het";
-}
+
 
 	tempstring.str("");
 	tempstring.clear();
